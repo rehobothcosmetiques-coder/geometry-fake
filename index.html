@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geometry Dash Mini 🎮</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            overflow: hidden;
+            font-family: Arial;
+        }
+
+        #game {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: cyan;
+            bottom: 0;
+            left: 100px;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: red;
+            bottom: 0;
+            right: -50px;
+        }
+
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 10px;
+            background: white;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="player"></div>
+    <div id="ground"></div>
+    <div id="score">Score: 0</div>
+
+</div>
+
+<script>
+
+let player = document.getElementById("player");
+let game = document.getElementById("game");
+let scoreText = document.getElementById("score");
+
+let isJumping = false;
+let gravity = 0.9;
+let velocity = 0;
+let position = 0;
+
+let score = 0;
+
+// saut
+document.addEventListener("keydown", function(e){
+    if(e.code === "Space" && !isJumping){
+        velocity = 15;
+        isJumping = true;
+    }
+});
+
+// physique joueur
+function updatePlayer(){
+    velocity -= gravity;
+    position += velocity;
+
+    if(position <= 0){
+        position = 0;
+        isJumping = false;
+    }
+
+    player.style.bottom = position + "px";
+}
+
+// obstacles
+function createObstacle(){
+    let obs = document.createElement("div");
+    obs.classList.add("obstacle");
+    game.appendChild(obs);
+
+    let pos = -50;
+
+    function move(){
+        pos += 6;
+        obs.style.right = pos + "px";
+
+        // collision
+        if(pos > window.innerWidth - 150 && pos < window.innerWidth - 90){
+            if(position < 40){
+                alert("💀 GAME OVER ! Score: " + score);
+                location.reload();
+            }
+        }
+
+        if(pos > window.innerWidth){
+            obs.remove();
+        }
+    }
+
+    setInterval(move, 20);
+}
+
+// score
+setInterval(() => {
+    score++;
+    scoreText.innerText = "Score: " + score;
+}, 500);
+
+// spawn obstacles
+setInterval(createObstacle, 1500);
+
+// game loop
+function loop(){
+    updatePlayer();
+    requestAnimationFrame(loop);
+}
+
+loop();
+
+</script>
+
+</body>
+</html>
